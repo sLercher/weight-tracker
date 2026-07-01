@@ -111,9 +111,9 @@
 
 {#if selectedEntry}
 	<div
-		class="mx-1 mt-2 rounded-xl border border-(--wt-border) bg-(--wt-surface-raised) px-4 py-3 text-sm text-(--wt-text)"
+		class="mx-1 mt-2 rounded-xl border border-(--wt-border) bg-(--wt-surface) px-4 py-3 text-sm text-(--wt-text)"
 	>
-		<div class="text-xs uppercase tracking-[0.16em] text-(--wt-muted)">Selected point</div>
+		<div class="text-md uppercase tracking-[0.16em] text-(--wt-muted)">Selected point</div>
 		<div class="mt-1 font-medium text-(--wt-text)">
 			{formatSelectedDate(selectedEntry.date)}
 		</div>

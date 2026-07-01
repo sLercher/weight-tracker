@@ -1,9 +1,16 @@
 <script>
-	import { getEntries, updateEntry, deleteEntry } from '$lib/db.js';
+	import {
+		getEntries,
+		updateEntry,
+		deleteEntry,
+		loadGoalSettings,
+		saveGoalSettings
+	} from '$lib/db.js';
 	import RangeSelector from '$lib/table/range-selector.svelte';
 	import TrendSummary from '$lib/table/trend-summary.svelte';
 	import SelectedPointCard from '$lib/table/selected-point-card.svelte';
 	import WeightChart from '$lib/table/weight-chart.svelte';
+	import TargetRange from './table/target-range.svelte';
 	import {
 		normalizeEntries,
 		filterEntriesByRange,
@@ -21,6 +28,10 @@
 	let loadError = $state('');
 	/** @type {number | null} */
 	let selectedEntryId = $state(null);
+	/** @type {number | null} */
+	let goalWeight = $state(null);
+	let showGoalInTable = $state(false);
+	let hasHydratedGoalSettings = $state(false);
 	/** @type {'7d' | '1m' | '3m' | '6m' | '1y'} */
 	let range = $state('7d');
 
@@ -30,7 +41,21 @@
 	const trendPoints = $derived.by(() => trendModel?.line ?? []);
 	const trendLabel = $derived.by(() => getTrendLabel(trendPoints));
 	const trendSlopeLabel = $derived.by(() => getTrendSlopeLabel(trendModel?.slopePerWeek));
-	const yBounds = $derived.by(() => getYBounds(filteredEntries));
+	const visibleGoalWeight = $derived.by(() => (showGoalInTable ? goalWeight : null));
+	const yBounds = $derived.by(() => {
+		const bounds = getYBounds(filteredEntries);
+		if (visibleGoalWeight == null || Number.isNaN(Number(visibleGoalWeight))) {
+			return bounds;
+		}
+
+		const low = Number(visibleGoalWeight) - 1;
+		const high = Number(visibleGoalWeight) + 1;
+
+		return {
+			min: Math.min(bounds.min, Math.floor(low - 0.5)),
+			max: Math.max(bounds.max, Math.ceil(high + 0.5))
+		};
+	});
 
 	const selectedEntry = $derived.by(() => {
 		if (selectedEntryId == null) {
@@ -67,6 +92,16 @@
 		}
 	}
 
+	async function hydrateGoalSettings() {
+		try {
+			const settings = await loadGoalSettings();
+			goalWeight = settings.goalWeight;
+			showGoalInTable = settings.showInTable;
+		} finally {
+			hasHydratedGoalSettings = true;
+		}
+	}
+
 	/**
 	 * @param {number} id
 	 * @param {number} value
@@ -92,6 +127,10 @@
 	});
 
 	$effect(() => {
+		hydrateGoalSettings();
+	});
+
+	$effect(() => {
 		if (newestEntryId == null) {
 			return;
 		}
@@ -107,6 +146,17 @@
 		if (!filteredEntries.some((entry) => entry.id === selectedEntryId)) {
 			selectedEntryId = null;
 		}
+	});
+
+	$effect(() => {
+		if (!hasHydratedGoalSettings) {
+			return;
+		}
+
+		saveGoalSettings({
+			goalWeight,
+			showInTable: showGoalInTable
+		});
 	});
 </script>
 
@@ -129,10 +179,15 @@
 			{trendPoints}
 			{yBounds}
 			{selectedEntryId}
+			goalWeight={visibleGoalWeight}
+			{showGoalInTable}
 			onSelect={(id) => (selectedEntryId = id)}
 		/>
 
-		<TrendSummary {trendLabel} {trendSlopeLabel} />
+		<div class="grid grid-cols-2">
+			<TrendSummary {trendLabel} {trendSlopeLabel} />
+			<TargetRange bind:goalWeight bind:showInTable={showGoalInTable} />
+		</div>
 
 		<SelectedPointCard
 			{selectedEntry}

@@ -19,6 +19,8 @@
 	 * trendPoints?: Array<{x: number, y: number}>,
 	 * yBounds?: {min: number, max: number},
 	 * selectedEntryId?: number | null,
+	 * goalWeight?: number | null,
+	 * showGoalInTable?: boolean,
 	 * onSelect?: (id: number | null) => void
 	 * }}
 	 */
@@ -27,6 +29,8 @@
 		trendPoints = [],
 		yBounds = { min: 0, max: 100 },
 		selectedEntryId = null,
+		goalWeight = null,
+		showGoalInTable = false,
 		onSelect = () => {}
 	} = $props();
 
@@ -53,6 +57,7 @@
 	const palette = {
 		accent: '#FB4C00',
 		accentSoft: '#141412',
+		goal: '#22C55E',
 		surfaceDark: '#141412',
 		text: '#F6F6F6',
 		muted: '#dbd7d7',
@@ -78,15 +83,75 @@
 			return;
 		}
 
+		const effectiveGoalWeight = showGoalInTable ? goalWeight : null;
+
 		const dataFingerprint = JSON.stringify({
 			points,
 			trendPoints,
-			yBounds
+			yBounds,
+			goalWeight: effectiveGoalWeight
 		});
+
+		const chartMinX = points[0]?.x;
+		const chartMaxX = points[points.length - 1]?.x;
+		const hasGoal =
+			effectiveGoalWeight != null &&
+			Number.isFinite(Number(effectiveGoalWeight)) &&
+			chartMinX != null &&
+			chartMaxX != null;
+		const goal = hasGoal ? Number(effectiveGoalWeight) : null;
+
+		/** @type {import('chart.js').ChartDataset<'line', {x: number, y: number}[]>[]} */
+		const datasets = [];
+
+		if (hasGoal && goal != null) {
+			datasets.push(
+				{
+					label: 'Goal range lower',
+					data: [
+						{ x: chartMinX, y: goal - 1 },
+						{ x: chartMaxX, y: goal - 1 }
+					],
+					parsing: false,
+					borderWidth: 0,
+					pointRadius: 0,
+					fill: false,
+					order: -2
+				},
+				{
+					label: 'Goal range upper',
+					data: [
+						{ x: chartMinX, y: goal + 1 },
+						{ x: chartMaxX, y: goal + 1 }
+					],
+					parsing: false,
+					borderWidth: 0,
+					pointRadius: 0,
+					fill: '-1',
+					backgroundColor: 'rgba(34, 197, 94, 0.18)',
+					order: -2
+				},
+				{
+					label: 'Goal',
+					data: [
+						{ x: chartMinX, y: goal },
+						{ x: chartMaxX, y: goal }
+					],
+					parsing: false,
+					borderColor: palette.goal,
+					borderWidth: 2,
+					pointRadius: 0,
+					fill: false,
+					tension: 0,
+					order: -1
+				}
+			);
+		}
 
 		/** @type {import('chart.js').ChartData<'line', {x: number, y: number}[]>} */
 		const data = {
 			datasets: [
+				...datasets,
 				{
 					label: 'Weight',
 					data: points,
@@ -129,14 +194,15 @@
 				mode: 'nearest',
 				intersect: true
 			},
-			onClick: (_event, activeElements) => {
+			onClick: (_event, activeElements, chartInstance) => {
 				if (!activeElements.length) {
 					onSelect(null);
 					return;
 				}
 
 				const { datasetIndex, index } = activeElements[0];
-				if (datasetIndex !== 0) {
+				const selectedDataset = chartInstance?.data?.datasets?.[datasetIndex];
+				if (selectedDataset?.label !== 'Weight') {
 					onSelect(null);
 					return;
 				}
@@ -187,7 +253,7 @@
 						color: palette.grid
 					},
 					ticks: {
-						color: palette.text
+						color: palette.muted
 					}
 				}
 			}
@@ -228,6 +294,6 @@
 	});
 </script>
 
-<div class="h-72 rounded-xl border border-(--wt-border) bg-(--wt-surface-raised) p-3 sm:h-80">
+<div class="h-72 rounded-xl border border-(--wt-border) bg-(--wt-surface) p-3 sm:h-80">
 	<canvas bind:this={canvasEl}></canvas>
 </div>

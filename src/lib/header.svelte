@@ -3,7 +3,7 @@
 </script>
 
 <header
-	class="relative overflow-hidden rounded-2xl border border-(--wt-border) bg-(--wt-surface-raised) px-5 py-5"
+	class="relative overflow-hidden rounded-2xl border border-(--wt-border) bg-(--wt-surface) px-5 py-5"
 >
 	<div class="relative flex flex-wrap items-start justify-between gap-4">
 		<div>

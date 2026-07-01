@@ -19,7 +19,7 @@
 		<button
 			type="button"
 			onclick={() => onChange(range.value)}
-			class={`w-full rounded-lg border px-2 py-1.5 text-xs font-semibold transition-colors ${value === range.value ? 'border-(--wt-accent) bg-(--wt-accent) text-white' : 'border-(--wt-border) bg-(--wt-surface-raised) text-(--wt-muted) hover:text-(--wt-text)'}`}
+			class={`w-full rounded-lg border px-2 py-1.5 text-xs font-semibold transition-colors ${value === range.value ? 'border-(--wt-accent) bg-(--wt-accent) text-white' : 'border-(--wt-border) bg-(--wt-surface) text-(--wt-muted) hover:text-(--wt-text)'}`}
 		>
 			{range.label}
 		</button>

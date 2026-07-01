@@ -3,7 +3,7 @@
 	import { addEntry } from '$lib/db.js';
 
 	/** @type {{ label: string, placeholder?: string, onAdded?: (id: number | null) => void | Promise<void> }} */
-	let { label, placeholder = 'e.g. 82.4', onAdded = () => {} } = $props();
+	let { label, placeholder = '', onAdded = () => {} } = $props();
 	let value = $state();
 	let errorMessage = $state('');
 
@@ -50,7 +50,7 @@
 			{placeholder}
 			aria-invalid={errorMessage.length > 0}
 			aria-describedby="weight-input-error"
-			class="w-full rounded-xl border border-(--wt-border) bg-(--wt-surface-raised) px-4 py-3 text-(--wt-text) placeholder:text-(--wt-muted)/70 outline-none transition-all focus:border-(--wt-accent) focus:ring-2 focus:ring-(--wt-accent)/20"
+			class="w-full rounded-xl border border-(--wt-border) bg-(--wt-surface) px-4 py-3 text-(--wt-text) placeholder:text-(--wt-muted)/70 outline-none transition-all focus:border-(--wt-accent) focus:ring-2 focus:ring-(--wt-accent)/20"
 		/>
 
 		<button
