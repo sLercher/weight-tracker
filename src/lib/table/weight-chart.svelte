@@ -34,6 +34,7 @@
 	let canvasEl = $state(null);
 	/** @type {import('chart.js').Chart<'line', {x: number, y: number}[]> | null} */
 	let chart = null;
+	let previousDataFingerprint = '';
 
 	const tickFormatter = new Intl.DateTimeFormat('de-DE', {
 		day: '2-digit',
@@ -73,8 +74,15 @@
 				chart.destroy();
 				chart = null;
 			}
+			previousDataFingerprint = '';
 			return;
 		}
+
+		const dataFingerprint = JSON.stringify({
+			points,
+			trendPoints,
+			yBounds
+		});
 
 		/** @type {import('chart.js').ChartData<'line', {x: number, y: number}[]>} */
 		const data = {
@@ -122,11 +130,13 @@
 			},
 			onClick: (_event, activeElements) => {
 				if (!activeElements.length) {
+					onSelect(null);
 					return;
 				}
 
 				const { datasetIndex, index } = activeElements[0];
 				if (datasetIndex !== 0) {
+					onSelect(null);
 					return;
 				}
 
@@ -188,12 +198,20 @@
 				data,
 				options
 			});
+			previousDataFingerprint = dataFingerprint;
+			return;
+		}
+
+		const isSelectionOnlyUpdate = previousDataFingerprint === dataFingerprint;
+		if (isSelectionOnlyUpdate) {
+			chart.update('none');
 			return;
 		}
 
 		chart.data = data;
 		chart.options = options;
 		chart.update();
+		previousDataFingerprint = dataFingerprint;
 	}
 
 	onMount(() => {
