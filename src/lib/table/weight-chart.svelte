@@ -103,7 +103,8 @@
 					pointHitRadius: 14,
 					pointRadius: 5,
 					pointHoverRadius: 7,
-					order: 1
+					order: 1,
+					clip: false
 				},
 				{
 					label: 'Trend',
