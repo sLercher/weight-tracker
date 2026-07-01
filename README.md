@@ -1,133 +1,112 @@
 # Weight Tracker
 
-A focused SvelteKit app for recording body weight entries, visualizing trends, and editing historical data.
+Small personal project to track body weight over time.
 
-## Stack
+This app is built for two goals:
 
-- SvelteKit + Svelte 5 runes
+- daily private use
+- learning Svelte and SvelteKit with a realistic, manageable project
+
+## What It Does
+
+- Add a weight entry with date/time
+- View entries in a table
+- Visualize trends in a chart
+- Edit and delete historical entries
+- Filter visible data by time range
+- Work as an installable PWA with offline asset caching
+
+## Tech Stack
+
+- SvelteKit 2 + Svelte 5 (runes mode)
 - Tailwind CSS v4
-- Dexie (IndexedDB persistence)
-- Chart.js (time-series chart rendering)
-- ESLint + Prettier + svelte-check
+- Dexie + IndexedDB (local persistence)
+- Chart.js for chart rendering
+- ESLint, Prettier, svelte-check
 
-## Quick Start
+## Project Intent
 
-```sh
-npm install
-npm run dev
-```
+This repository is intentionally small and practical. It favors clarity over abstraction so it can be used as a learning codebase while still being useful day to day.
 
-Production workflow:
+## Getting Started
 
-```sh
-npm run check
-npm run lint
-npm run build
-```
+Requirements:
 
-## PWA + GitHub Pages
+- Node.js 22+
+- npm
 
-This project is configured as a Progressive Web App:
+Install and run locally:
 
-- `static/manifest.json` provides install metadata.
-- `src/service-worker.js` pre-caches build/static assets for offline use.
-- `src/routes/+layout.js` enables prerendering so output is static-host friendly.
+    npm install
+    npm run dev
 
-For GitHub Pages project sites (`https://<user>.github.io/<repo>/`), set a base path at build time:
+Open the local URL shown by Vite in your terminal.
 
-```sh
-BASE_PATH=/weight-tracker npm run build
-```
+## Available Scripts
 
-On Windows PowerShell:
+- npm run dev: Start local development server
+- npm run check: Run Svelte diagnostics
+- npm run check:watch: Run diagnostics in watch mode
+- npm run lint: Run Prettier check and ESLint
+- npm run format: Auto-format project files
+- npm run build: Create production build
+- npm run preview: Preview production build locally
 
-```powershell
-$env:BASE_PATH='/weight-tracker'; npm run build
-```
+## Data and Privacy
 
-In GitHub Actions you can derive this automatically:
+- Data is stored locally in your browser (IndexedDB).
+- No backend or cloud sync is included.
+- If you clear site data/browser storage, entries are lost.
 
-```yaml
-env:
-  BASE_PATH: /${{ github.event.repository.name }}
-```
+If you plan to use this beyond personal experimentation, create a backup/export strategy first.
 
-The static output is generated in `build/` and can be published to GitHub Pages.
+## PWA Notes
 
-## Scripts
+The app includes:
 
-- `npm run dev`: start local dev server
-- `npm run check`: run Svelte diagnostics (`svelte-check`)
-- `npm run lint`: run Prettier check + ESLint
-- `npm run format`: auto-format source files
-- `npm run build`: create production bundle
-- `npm run preview`: preview production build locally
+- Web app manifest at static/manifest.json
+- Service worker at src/service-worker.js
+- Prerendering for static hosting in src/routes/+layout.js
 
-## Architecture
+PWA install availability depends on browser requirements (HTTPS, valid manifest, active service worker, and engagement heuristics).
 
-### Data Layer
+## Deploying to GitHub Pages
 
-- `src/lib/db.js`
-- Single Dexie database: `weight-db`
-- Table: `entries` with schema `++id,date`
-- Public API:
-  - `addEntry(value)`
-  - `updateEntry(id, changes)`
-  - `deleteEntry(id)`
-  - `getEntries()`
+This project is configured for static deployment and includes a GitHub Actions workflow in .github/workflows/deploy.yml.
 
-### UI Composition
+Manual build for a repo named weight-tracker:
 
-- `src/routes/+page.svelte`
-  - top-level page composition
-  - coordinates entry creation and table refresh
-- `src/lib/input.svelte`
-  - validates and submits new entries
-  - reports save errors to the user
-- `src/lib/table.svelte`
-  - loads entries
-  - manages selected point and date range
-  - orchestrates chart + trend + edit card subcomponents
+PowerShell:
 
-### Chart and Trend Logic
+    $env:BASE_PATH='/weight-tracker'; npm run build
 
-- `src/lib/table/chart-logic.js`
-  - pure utility functions for sorting/filtering and trend computation
-- `src/lib/table/weight-chart.svelte`
-  - renders data and trend datasets with Chart.js
-  - emits selection events to parent state
+bash:
 
-## Engineering Notes
+    BASE_PATH=/weight-tracker npm run build
 
-- Prefer small, pure utility functions for business logic (`chart-logic.js`) and keep components focused on rendering and event wiring.
-- Keep async UI actions resilient:
-  - surface user-safe error messages
-  - avoid stale-load races when multiple refreshes happen quickly
-- Follow runes mode patterns:
-  - `$state` for mutable state
-  - `$derived` for computed state
-  - `$effect` for side effects
+Output is generated in the build directory.
 
-## Data Model
+The workflow uses BASE_PATH=/${{ github.event.repository.name }} so repo renames do not require workflow edits.
 
-Entry shape:
+## Project Structure
 
-```js
-{
-	id: number,
-	value: number,
-	date: Date
-}
-```
+- src/routes/+page.svelte: top-level page composition
+- src/lib/input.svelte: add-entry form and validation
+- src/lib/table.svelte: table, range controls, selected-entry flow
+- src/lib/table/weight-chart.svelte: chart rendering and selection interaction
+- src/lib/table/chart-logic.js: pure data and trend utilities
+- src/lib/db.js: Dexie schema and CRUD API
 
 ## Quality Checklist
 
-Before merging changes:
+Before publishing:
 
-1. `npm run check` passes with 0 errors/warnings.
-2. `npm run lint` passes.
-3. Manual smoke test:
-   - add entry
-   - select and edit point
-   - delete point
-   - switch ranges and verify chart/trend updates
+1. Run npm run check
+2. Run npm run lint
+3. Run npm run build
+4. Manually test add, edit, delete, and range switching
+5. Verify install prompt or Add to Home Screen behavior in target browser
+
+## Disclaimer
+
+This is a personal tracking tool and learning project, not medical software. Do not use it as a substitute for professional medical advice.
