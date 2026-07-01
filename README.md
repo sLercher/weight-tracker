@@ -25,6 +25,35 @@ npm run lint
 npm run build
 ```
 
+## PWA + GitHub Pages
+
+This project is configured as a Progressive Web App:
+
+- `static/manifest.json` provides install metadata.
+- `src/service-worker.js` pre-caches build/static assets for offline use.
+- `src/routes/+layout.js` enables prerendering so output is static-host friendly.
+
+For GitHub Pages project sites (`https://<user>.github.io/<repo>/`), set a base path at build time:
+
+```sh
+BASE_PATH=/weight-tracker npm run build
+```
+
+On Windows PowerShell:
+
+```powershell
+$env:BASE_PATH='/weight-tracker'; npm run build
+```
+
+In GitHub Actions you can derive this automatically:
+
+```yaml
+env:
+  BASE_PATH: /${{ github.event.repository.name }}
+```
+
+The static output is generated in `build/` and can be published to GitHub Pages.
+
 ## Scripts
 
 - `npm run dev`: start local dev server

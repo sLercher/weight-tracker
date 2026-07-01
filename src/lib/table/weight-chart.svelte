@@ -94,18 +94,20 @@
 					pointBorderWidth: 3,
 					pointHitRadius: 14,
 					pointRadius: 5,
-					pointHoverRadius: 7
+					pointHoverRadius: 7,
+					order: 1
 				},
 				{
 					label: 'Trend',
 					data: trendPoints,
 					parsing: false,
-					borderColor: palette.accentSoft,
-					borderWidth: 2,
+					borderColor: '#3972B7',
+					borderWidth: 3,
 					borderDash: [6, 6],
 					pointRadius: 0,
 					fill: false,
-					tension: 0.35
+					tension: 0.35,
+					order: 0
 				}
 			]
 		};
