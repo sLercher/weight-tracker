@@ -73,5 +73,10 @@
 
 	<TagSelection {selectedTags} onChange={handleTagsChange} />
 
-	<p id="weight-input-error" class="mt-2 min-h-5 text-xs text-(--wt-danger)">{errorMessage}</p>
+	<p
+		id="weight-input-error"
+		class="mt-2 min-h-5 text-xs text-(--wt-danger) {errorMessage ? 'block' : 'hidden'}"
+	>
+		{errorMessage}
+	</p>
 </form>
