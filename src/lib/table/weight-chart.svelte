@@ -15,7 +15,7 @@
 
 	/**
 	 * @type {{
-	 * entries?: Array<{id: number, value: number, date: Date}>,
+	 * entries?: Array<{id: number, value: number, date: Date, tags?: string[]}>,
 	 * trendPoints?: Array<{x: number, y: number}>,
 	 * yBounds?: {min: number, max: number},
 	 * selectedEntryId?: number | null,
@@ -228,7 +228,21 @@
 							if (value == null) {
 								return '';
 							}
-							return `${value.toFixed(1)} kg`;
+
+							const prefix = context.dataset?.label === 'Trend' ? 'Trend: ' : '';
+							return `${prefix}${value.toFixed(1)} kg`;
+						},
+						afterLabel: (context) => {
+							if (context.dataset?.label !== 'Weight') {
+								return [];
+							}
+
+							const entry = entries[context.dataIndex];
+							if (!entry || !Array.isArray(entry.tags) || entry.tags.length === 0) {
+								return;
+							}
+
+							return ['', ...entry.tags];
 						}
 					}
 				}

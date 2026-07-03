@@ -1,11 +1,15 @@
 /** @typedef {'7d' | '1m' | '3m' | '6m' | '1y'} Range */
 
 /**
- * @param {Array<{id: number, value: number, date: Date | string}>} entries
+ * @param {Array<{id: number, value: number, date: Date | string, tags?: string[]}>} entries
  */
 export function normalizeEntries(entries) {
 	return [...entries]
-		.map((entry) => ({ ...entry, date: new Date(entry.date) }))
+		.map((entry) => ({
+			...entry,
+			date: new Date(entry.date),
+			tags: Array.isArray(entry.tags) ? entry.tags : []
+		}))
 		.sort((a, b) => a.date.getTime() - b.date.getTime());
 }
 

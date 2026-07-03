@@ -1,11 +1,19 @@
 <script>
 	import Send from '@lucide/svelte/icons/send';
+	import TagSelection from '$lib/tags/tag-selection.svelte';
 	import { addEntry } from '$lib/db.js';
 
 	/** @type {{ label: string, placeholder?: string, onAdded?: (id: number | null) => void | Promise<void> }} */
 	let { label, placeholder = '', onAdded = () => {} } = $props();
 	let value = $state();
+	/** @type {string[]} */
+	let selectedTags = $state([]);
 	let errorMessage = $state('');
+
+	/** @param {string[]} nextTags */
+	function handleTagsChange(nextTags) {
+		selectedTags = nextTags;
+	}
 
 	/**
 	 * Handles the submit event for a new entry.
@@ -19,9 +27,10 @@
 		errorMessage = '';
 
 		try {
-			const id = await addEntry(value);
+			const id = await addEntry(value, selectedTags);
 			await onAdded(id);
 			value = null;
+			selectedTags = [];
 		} catch {
 			errorMessage = 'Unable to save your entry. Please try again.';
 		}
@@ -61,6 +70,8 @@
 			<Send size={18} />
 		</button>
 	</div>
+
+	<TagSelection {selectedTags} onChange={handleTagsChange} />
 
 	<p id="weight-input-error" class="mt-2 min-h-5 text-xs text-(--wt-danger)">{errorMessage}</p>
 </form>

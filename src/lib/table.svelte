@@ -22,7 +22,7 @@
 
 	let { refreshKey = 0, newestEntryId = null } = $props();
 
-	/** @type {Array<{id: number, value: number, date: Date | string}>} */
+	/** @type {Array<{id: number, value: number, date: Date | string, tags?: string[]}>} */
 	let entries = $state([]);
 	let isLoading = $state(true);
 	let loadError = $state('');
@@ -106,9 +106,11 @@
 	 * @param {number} id
 	 * @param {number} value
 	 * @param {Date} date
+	 * @param {string[]} tags
 	 */
-	async function handleSaveSelected(id, value, date) {
-		await updateEntry(id, { value, date });
+	async function handleSaveSelected(id, value, date, tags) {
+		await updateEntry(id, { value, date, tags });
+		selectedEntryId = null;
 		await loadEntries();
 	}
 

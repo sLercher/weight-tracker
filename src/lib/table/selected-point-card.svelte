@@ -1,19 +1,27 @@
 <script>
 	import Save from '@lucide/svelte/icons/save';
 	import Trash from '@lucide/svelte/icons/trash-2';
+	import TagSelection from '$lib/tags/tag-selection.svelte';
 
 	/**
 	 * @type {{
-	 * selectedEntry?: {id: number, value: number, date: Date} | null,
-	 * onSave?: (id: number, value: number, date: Date) => Promise<void> | void,
+	 * selectedEntry?: {id: number, value: number, date: Date, tags?: string[]} | null,
+	 * onSave?: (id: number, value: number, date: Date, tags: string[]) => Promise<void> | void,
 	 * onDelete?: (id: number) => Promise<void> | void
 	 * }}
 	 */
 	let { selectedEntry = null, onSave = () => {}, onDelete = () => {} } = $props();
 	let editValue = $state('');
 	let editDate = $state('');
+	/** @type {string[]} */
+	let editTags = $state([]);
 	let isSaving = $state(false);
 	let isDeleting = $state(false);
+
+	/** @param {string[]} nextTags */
+	function handleTagsChange(nextTags) {
+		editTags = nextTags;
+	}
 
 	const dateTimeFormatter = new Intl.DateTimeFormat('de-DE', {
 		day: '2-digit',
@@ -58,6 +66,7 @@
 		if (selectedEntry) {
 			editValue = String(selectedEntry.value);
 			editDate = toInputDateTime(selectedEntry.date);
+			editTags = Array.isArray(selectedEntry.tags) ? [...selectedEntry.tags] : [];
 		}
 	});
 
@@ -89,7 +98,7 @@
 
 		isSaving = true;
 		try {
-			await onSave(selectedEntry.id, parsed, parsedDate);
+			await onSave(selectedEntry.id, parsed, parsedDate, editTags);
 		} finally {
 			isSaving = false;
 		}
@@ -135,6 +144,7 @@
 					class="w-full rounded-lg border border-(--wt-border) bg-(--wt-surface) px-3 py-2 text-(--wt-text) outline-none transition-colors focus:border-(--wt-accent)"
 				/>
 			</div>
+			<TagSelection selectedTags={editTags} onChange={handleTagsChange} />
 			<div class="grid grid-cols-2 gap-2">
 				<button
 					type="button"
