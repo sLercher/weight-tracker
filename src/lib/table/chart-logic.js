@@ -108,6 +108,7 @@ export function getTrendLabel(trendPoints) {
 	if (delta > 0.1) {
 		return 'Gaining weight';
 	}
+	
 	return 'Stable trend';
 }
 
