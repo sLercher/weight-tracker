@@ -21,7 +21,7 @@
 		<label class="relative inline-flex cursor-pointer items-center">
 			<input type="checkbox" class="peer sr-only" bind:checked={showInTable} />
 			<div
-				class="group peer ring-0 bg-(--wt-surface-raised) after:bg-white rounded-full duration-300 w-10 h-5 after:duration-300 peer-checked:bg-(--wt-accent) after:rounded-full after:absolute after:h-4 after:w-4 after:top-0.5 after:left-0.5 after:flex after:justify-center after:items-center peer-checked:after:translate-x-5 peer-hover:after:scale-95"
+				class="group peer relative ring-0 bg-(--wt-surface-raised) after:bg-white rounded-full duration-300 w-10 h-5 after:duration-300 peer-checked:bg-(--wt-accent) after:rounded-full after:absolute after:h-4 after:w-4 after:top-0.5 after:left-0.5 after:flex after:justify-center after:items-center peer-checked:after:left-auto peer-checked:after:right-0.5 peer-hover:after:scale-95"
 			></div>
 			<p class="ml-2 text-sm text-(--wt-muted)">Show in table</p>
 		</label>
